@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+     
+     <h:head></h:head>
+     <body>
+		<ui:composition template="/WEB-INF/templates/master.xhtml">
+				<ui:define name="content">
+					<h1>Usuarios</h1>
+					
+					<h:form id="frmx">
+						<h:panelGrid id = "pgBusqueda" columns="2">
+							<p:inputText id="txtUsuarioBusqueda" placeholder="Buscar Usuarios" value="#{usuarioBean.nombre}"/>
+							<p:commandButton value="Buscar" actionListener="#{usuarioBean.buscar()}" update="frm:dt"/>
+						</h:panelGrid>
+					</h:form>
+					
+					<h:form id="frm">
+						<p:growl showDetail="true" showSummary="true">
+							<p:autoUpdate/>
+						</p:growl>
+			
+						<p:dataTable id="dt" var="e" value="#{usuarioBean.lista}" 
+									 paginator="true" rows="5" 
+									 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 					 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                 					 rowsPerPageTemplate="5,10,15">
+						
+							<p:column headerText="Nombre de Usuario">
+								<p:outputLabel value="#{e.usuario}"/>
+							</p:column>
+							
+							<p:column headerText="Estado">
+								<p:outputLabel value="#{e.estado}"/>
+							</p:column>
+							
+							<p:column headerText="Acciones">
+								<p:commandButton value="Ver"
+												 actionListener="#{usuarioBean.mostrarData(e)}" 
+												 oncomplete="PF('wdlg').show()"
+												 update="frm:dlg" 
+												  
+												 process="@this"/>
+							</p:column>
+						</p:dataTable>
+						
+						
+						<p:dialog id="dlg" widgetVar="wdlg" header="Modificando Usuario: #{usuarioBean.user.usuario}" modal="true" closeOnEscape="true" resizable="false" draggable="true">
+							
+							<h:panelGrid id="pg" columns="4">
+							
+								<p:outputLabel for="txtUsuario" value="Usuario"/>
+								<p:inputText id="txtUsuario" value="#{usuarioBean.user.usuario}" disabled="true"/>	
+								<h:column/>
+								<h:column/>
+								
+								<p:outputLabel for="txtClaveVal" value="Clave actual"/>
+								<h:inputSecret id="txtClaveVal" 
+								               value="#{usuarioBean.claveVerificacion}" 
+								               disabled="#{usuarioBean.verificado == 'ok'}"
+								               required="true"/>
+								<p:message for="txtClaveVal" display="icon"/>
+								<p:commandButton value="VERIFICAR" 
+								                 actionListener="#{usuarioBean.verificar()}"
+								                 update="pg"
+								                 disabled="#{usuarioBean.verificado == 'ok'}"
+								                 ajax="true"/>
+								
+								
+								<p:outputLabel for="pwd1" value="Nueva Contraseña" />
+		    					<p:password id="pwd1" 
+		    					            value="#{usuarioBean.claveNueva}" 
+		    					            match="pwd2" 
+		    					            label="Password 1" 
+		    					            required="true"
+		    					            disabled="#{usuarioBean.verificado != 'ok'}"
+		    					            validatorMessage="Constraseña"/>
+		    					<p:message for="pwd1" display="icon"/>
+		    					<h:column/>
+		    					
+		     					<p:outputLabel for="pwd2" value="Repetir Contraseña" />
+		    					<p:password id="pwd2" 
+		    					            value="#{usuarioBean.claveNueva}" 
+		    					            label="Password 2" 
+		    					            disabled="#{usuarioBean.verificado != 'ok'}"
+		    					            required="true"/>
+		    					<h:column/>
+		    					<h:column/> 
+		    					
+		    					<h:column/>
+								<p:commandButton value="ACEPTAR" 
+								                 actionListener="#{usuarioBean.actualizar()}"
+								                 update="pg"
+								                 oncomplete="if(args &amp;&amp; !args.validationFailed) PF('wdlg').hide()"
+								                 disabled="#{usuarioBean.verificado != 'ok'}"
+								                 ajax="true"/>
+								<h:column/>
+								<p:commandButton value="CANCELAR"
+								                 oncomplete="PF('wdlg').hide()"
+								                 immediate="true"
+								                 ajax="true"/>
+		    					
+							</h:panelGrid>
+							
+	
+						</p:dialog>
+					</h:form>
+				</ui:define>
+		</ui:composition>
+     </body>
+</html>
